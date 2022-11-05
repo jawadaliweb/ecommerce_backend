@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-lk6*46dwn=g_(^=b3yilv+u1#)1%fc=wq#riq-urr8-yy9x12a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['18.139.252.107']
 
 
 # Application definition
@@ -85,12 +85,18 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'ecommerce',
+#         'USER': 'root',
+#         'PASSWORD': '',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ecommerce',
-        'USER': 'root',
-        'PASSWORD': '',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -135,7 +141,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # ------------ MEDIA FILES CONFIGURATION ------------
 # ------------ STATIC FILES CONFIGURATION ------------
 STATIC_URL = "static/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static/")]
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, "static/")]
+STATIC_ROOT = '/home/bitnami/django/static/'
 # ------------ STATIC FILES CONFIGURATION ------------
 
 # Default primary key field type

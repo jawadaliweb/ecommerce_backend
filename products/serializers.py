@@ -1,4 +1,4 @@
-from tkinter import Image
+
 from unicodedata import category
 from .models import Product,Category,ProductImage
 from rest_framework import serializers

@@ -1,11 +1,4 @@
-from dataclasses import fields
-from itertools import product
-from pickletools import read_int4
-from pyexpat import model
-from tkinter import Image
-from unicodedata import category
 
-import orders
 from .models import Customer,Order,order_item
 from rest_framework import serializers
 

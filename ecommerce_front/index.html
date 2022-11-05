@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+      crossorigin="anonymous"
+    />
+    <style>
+      .d-flex {
+        flex-wrap: wrap;
+        
+      }
+      .card {
+        width: 250px;
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" >
+      <div class="d-flex" id="data"></div>
+      <form class="col-6" onsubmit="return false">
+        <div class="form-group">
+          <label for="name">name</label>
+          <input type="text" id="name" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="price">price</label>
+          <input type="number" id="price" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="weight">weight</label>
+          <input type="number" id="weight" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="thumbnail">thumbnail</label>
+          <input type="file" id="thumbnail" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="description">description</label>
+          <textarea id="description" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="form-group py-2 d-flex justify-content-end">
+          <button class="btn btn-primary" onclick="postProduct()">Save</button>
+        </div>
+      </form>
+    </div>
+    <div id="display-imag" class="col-6 py-5"></div>
+    <script>
+      function postProduct() {
+        let name = document.getElementById('name').value
+        let price = document.getElementById('price').value
+        let description = document.getElementById('description').value
+        let weight = document.getElementById('weight').value
+        let thumbnail = document.getElementById('thumbnail').value
+        
+        const form = new FormData();
+        form.append("name", name);
+        form.append("price", price);
+        form.append("description", description);
+        form.append("weight", weight);
+        form.append("thumbnail", thumbnailSource, thumbnailSource.name);
+
+        document.getElementById('name').value = ''
+        document.getElementById('price').value = ''
+        document.getElementById('description').value = ''
+        document.getElementById('weight').value = ''
+        document.getElementById('thumbnail').value = ''
+        thumbnailSource = ''
+
+        const settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://127.0.0.1:8000/api/products/",
+          "method": "POST",
+          "headers": {},
+          "processData": false,
+          "contentType": false,
+          "mimeType": "multipart/form-data",
+          "data": form
+        };
+
+        $.ajax(settings).done(function (response) {
+          item = JSON.parse(response)
+          let data = `
+            <div class="card mx-3">
+                <img class="card-img-top" src="${item.thumbnail}">
+                <div class="card-body">
+                    <h5 class="card-title">${item.name}</h5>
+                    <p class="card-text">${item.description}</p>
+                    <p class="card-text">${item.price}</p>
+                    <a href="#" class="btn btn-danger" onclick="destroyProduct(${item.id})">Delete</a>
+                    <a href="#" class="btn btn-warning" id="u${item.id}" onclick="patchProduct(${item.id})">Update</a>
+                </div>
+            </div>
+            `;
+          document.getElementById("data").insertAdjacentHTML('beforeend' ,data)
+        });
+      }
+      let thumbnail = document.getElementById('thumbnail')
+      let thumbnailSource 
+      thumbnail.addEventListener('change', (e) => {
+        thumbnailSource = e.target.files[0]
+        console.log(thumbnailSource)
+      })
+
+
+      function patchProduct(id) {
+        let button = document.getElementById('u'+id)
+        // console.log(button.parentElement.parentElement.children[0])
+        // return 0
+
+        let name = document.getElementById('name').value
+        let price = document.getElementById('price').value
+        let description = document.getElementById('description').value
+        let weight = document.getElementById('weight').value
+        let thumbnail = document.getElementById('thumbnail').value
+        
+        const form = new FormData();
+        if (name)
+        form.append("name", name);
+        if (price)
+        form.append("price", price);
+        if (description)
+        form.append("description", description);
+        if (weight)
+        form.append("weight", weight);
+        if (thumbnailSource)
+          form.append("thumbnail", thumbnailSource, thumbnailSource.name);
+        
+
+
+        document.getElementById('name').value = ''
+        document.getElementById('price').value = ''
+        document.getElementById('description').value = ''
+        document.getElementById('weight').value = ''
+        document.getElementById('thumbnail').value = ''
+        thumbnailSource = ''
+
+        const settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://127.0.0.1:8000/api/products/"+id+"/",
+          "method": "PATCH",
+          "headers": {},
+          "processData": false,
+          "contentType": false,
+          "mimeType": "multipart/form-data",
+          "data": form
+        };
+
+        $.ajax(settings).done(function (response) {
+          // button.parentElement.children
+          // card.querySelector('.card-title').innerHTML = JSON.parse(response).name
+          button.parentElement.children[0].innerHTML = JSON.parse(response).name
+          button.parentElement.children[1].innerHTML = JSON.parse(response).description
+          button.parentElement.children[2].innerHTML = JSON.parse(response).price
+          button.parentElement.parentElement.children[0].src = JSON.parse(response).thumbnail
+        });
+      }
+
+
+      function destroyProduct(id) {
+        const settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "http://127.0.0.1:8000/api/products/"+id+"/",
+          "method": "DELETE",
+          "headers": {}
+        };
+
+        $.ajax(settings).done(function (response) {
+          document.getElementById('u'+id).parentElement.parentElement.remove()
+        });
+      }
+
+
+      const settings = {
+        async: true,
+        crossDomain: true,
+        url: "http://127.0.0.1:8000/api/products/",
+        method: "GET",
+        headers: {},
+      };
+
+      $.ajax(settings).done(function (response) {
+        for (let item of response) {
+          // let cardElement = document.createElement('div')
+          // let cardImage = document.createElement('img')
+          // let cardBody = document.createElement('div')
+          // let cardTitle = document.createElement('h5')
+          // let cardText = document.createElement('p')
+          // let updateButton = document.createElement('button')
+          // let deleteButton = document.createElement('button')
+
+          // cardElement.classList.add('card')
+          // cardElement.classList.add('m-3')
+          // cardImage.classList.add('card-img-top')
+          // cardImage.style.width = '300px'
+          // cardImage.src = item.thumbnail
+          // cardBody.classList.add('card-body')
+          // cardTitle.classList.add('card-title')
+          // cardTitle.innerHTML = item.name
+          // cardText.classList.add('card-text')
+          // cardText.innerHTML = item.description
+
+          // updateButton.classList.add('btn')
+          // updateButton.classList.add('btn-warning')
+          // // updateButton.id = item.id
+          // updateButton.innerHTML = 'Update'
+          // updateButton.addEventListener('click', () => {
+          //   patchProduct(item.id, cardElement)
+          // })
+
+          // deleteButton.classList.add('mx-2')
+          // deleteButton.classList.add('btn')
+          // deleteButton.classList.add('btn-danger')
+          // deleteButton.innerHTML = 'Delete'
+
+          // cardBody.appendChild(cardTitle)
+          // cardBody.appendChild(cardText)
+          // cardBody.appendChild(updateButton)
+          // cardBody.appendChild(deleteButton)
+
+          // cardElement.appendChild(cardImage)
+          // cardElement.appendChild(cardBody)
+
+          let data = `
+            <div class="card mx-3">
+                <img class="card-img-top" src="${item.thumbnail}">
+                <div class="card-body">
+                    <h5 class="card-title">${item.name}</h5>
+                    <p class="card-text">${item.description}</p>
+                    <p class="card-text">${item.price}</p>
+                    <a href="#" class="btn btn-danger" onclick="destroyProduct(${item.id})">Delete</a>
+                    <a href="#" class="btn btn-warning" id="u${item.id}" onclick="patchProduct(${item.id})">Update</a>
+                </div>
+            </div>
+            `;
+          document.getElementById("data").insertAdjacentHTML('beforeend' ,data)
+          
+        }
+      });
+
+
+    </script>
+    <!-- JavaScript Bundle with Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
